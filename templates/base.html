@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Ticket System</title>
+        <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">        
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}?v=1.0"> <!-- Добавьте версию -->
+    </head>
+<body>
+    <nav>
+        <a href="{{ url_for('index') }}">Главная</a>
+        <a href="{{ url_for('my_tickets') }}">Мои заявки</a>
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('admin') }}">Админ панель</a>
+            <a href="{{ url_for('logout') }}">Выход</a>
+        {% else %}
+            <a href="{{ url_for('login') }}">Вход</a>
+        {% endif %}
+    </nav>
+    
+    <div>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+    {% if current_user.is_authenticated %}
+        <div id="new-tickets">
+            <!-- Здесь будут отображаться новые заявки -->
+        </div>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                setInterval(function() {
+                    $.getJSON('/check_new_tickets', function(data) {
+                        if (data.new_tickets.length > 0) {
+                            let newTicketsList = '<ul>';
+                            data.new_tickets.forEach(function(ticket) {
+                                newTicketsList += '<li><a href="/ticket/' + ticket.id + '">Заявка: ' + ticket.title + '</a></li>';
+                            });
+                            newTicketsList += '</ul>';
+                            console.log(newTicketsList)
+                            // Отображаем новые заявки в элементе с id "new-tickets"
+                            $('#new-tickets').html(newTicketsList);
+                        }
+                    });
+                }, 600000); // Проверяем каждые 10 минуту
+            });
+        </script>        
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1>Заявка #{{ ticket.id }}</h1>
+    <p><strong>Заголовок:</strong> {{ ticket.title }}</p>
+    <p><strong>Описание:</strong> {{ ticket.description }}</p>
+    <p><strong>Статус:</strong> {{ ticket.status }}</p>
+    <p><strong>Дата создания:</strong> {{ ticket.created_at }}</p>
+    {% if ticket.received_at %}
+        <p><strong>Дата получения:</strong> {{ ticket.received_at }}</p>
+    {% endif %}
+    {% if ticket.closed_at %}
+        <p><strong>Дата закрытия:</strong> {{ ticket.closed_at }}</p>
+    {% endif %}
+
+    <h2>Загруженные файлы:</h2>
+    <ul>
+        {% for file in ticket.files %}
+            <li><a href="{{ url_for('download_file', ticket_id=ticket.id, filename=file.filename) }}">{{ file.filename }}</a></li>
+        {% endfor %}
+    </ul>
+
+    <h2>Чат по заявке</h2>
+    <div>
+        {% for message in messages %}
+            <div>
+                <strong>{{ message.pc_name }} ({{ message.ip_address }}):</strong> {{ message.content }} <em>{{ message.created_at }}</em>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <form action="{{ url_for('view_ticket', ticket_id=ticket.id) }}" method="POST">
+        <textarea name="content" required></textarea>
+        <button type="submit">Отправить</button>
+    </form>
+
+    <a href="{{ url_for('my_tickets') }}">Назад к моим заявкам</a>
+{% endblock %}

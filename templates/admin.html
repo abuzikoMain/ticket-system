@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>Админ панель</h2>
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Дата Создания</th>
+            <th>Дата Получения</th>
+            <th>Дата Закрытия</th>
+            <th>Заголовок</th>
+            <th>Статус</th>
+            <th>Имя ПК</th>
+            <th>IP-адрес</th>
+            <th>Файлы</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for ticket in tickets.items %}
+        <tr>
+            <td><a href="{{ url_for('view_ticket', ticket_id=ticket.id) }}">{{ ticket.id }}</a></td>
+            <td>{{ ticket.created_at }}</td>
+            <td>{{ ticket.received_at }}</td>
+            <td>{{ ticket.closed_at }}</td>
+            <td><a href="{{ url_for('view_ticket', ticket_id=ticket.id) }}">{{ ticket.title }}</a></td>
+            <td>{{ ticket.status }}</td>
+            <td>{{ ticket.pc_name }}</td>
+            <td>{{ ticket.ip_address }}</td>
+            <td>
+                {% for file in ticket.files %}
+                    <a href="{{ url_for('download_file', ticket_id=ticket.id, filename=file.filename) }}">{{ file.filename }}</a><br>
+                {% endfor %}
+            </td>
+            <td>
+                <form action="{{ url_for('update_ticket', ticket_id=ticket.id) }}" method="POST">
+                    <select name="status">
+                        <option value="Открыта" {% if ticket.status == 'Открыта' %}selected{% endif %}>Открыта</option>
+                        <option value="В работе" {% if ticket.status == 'В работе' %}selected{% endif %}>В работе</option>
+                        <option value="Закрыта" {% if ticket.status == 'Закрыта' %}selected{% endif %}>Закрыта</option>
+                    </select>
+                    <button type="submit">Обновить статус</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div>
+    {% if tickets.has_prev %}
+        <a href="{{ url_for('admin', page=tickets.prev_num) }}">« Предыдущая</a>
+    {% endif %}
+    <span>Страница {{ tickets.page }} из {{ tickets.pages }}</span>
+    {% if tickets.has_next %}
+        <a href="{{ url_for('admin', page=tickets.next_num) }}">Следующая »</a>
+    {% endif %}
+</div>
+
+
+
+{% endblock %}
