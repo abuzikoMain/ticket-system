@@ -4,15 +4,9 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from datetime import datetime
 from forms import TicketForm
 from models import db, User, Ticket, Role, File, Message
-# from celery import Celery
 from config import Config
 import getpass
 import os
-
-# def make_celery(app):
-#     celery = Celery(app.import_name, backend=Config.CELERY_RESULT_BACKEND, broker=Config.CELERY_BROKER_URL)
-#     celery.conf.update(app.config)
-#     return celery
 
 app = Flask(__name__)
 app.config.from_object(Config)
